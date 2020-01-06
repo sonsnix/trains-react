@@ -1,0 +1,63 @@
+const tilesInitialState = [
+    { type: "map_offsite", rotation: 0, loc: "-5,11" },
+    { type: "map_takamatsu", rotation: 0, loc: "-4,14" },
+    { type: "map_empty", rotation: 0, loc: "-4,12" },
+    { type: "map_mountain", rotation: 0, loc: "-2,10" },
+    { type: "map_city", rotation: 0, loc: "-4,10" },
+    { type: "map_offsite", rotation: 0, loc: "-3,5" },
+    { type: "map_empty", rotation: 0, loc: "-3,9" },
+    { type: "map_kotohira", rotation: 0, loc: "-3,11" },
+    { type: "map_town", rotation: 0, loc: "-3,13" },
+    { type: "map_river", rotation: 0, loc: "-3,15" },
+    { type: "map_offsite", rotation: 0, loc: "-3,17" },
+    { type: "map_city", rotation: 0, loc: "-2,4" },
+    { type: "map_city", rotation: 0, loc: "-2,6" },
+    { type: "map_city", rotation: 0, loc: "-2,8" },
+    { type: "map_fixed_n214", rotation: 0, loc: "-2,14" },
+    { type: "map_river", rotation: 0, loc: "-2,12" },
+    { type: "map_city", rotation: 0, loc: "-2,16" },
+    { type: "map_empty", rotation: 0, loc: "-1,3" },
+    { type: "map_mountain", rotation: 0, loc: "-1,5" },
+    { type: "map_mountain", rotation: 0, loc: "-1,7" },
+    { type: "map_mountain", rotation: 0, loc: "-1,9" },
+    { type: "map_city", rotation: 0, loc: "-1,11" },
+    { type: "map_empty", rotation: 0, loc: "-1,13" },
+    { type: "map_coastal", rotation: 0, loc: "-1,15" },
+    { type: "map_fixed_00", rotation: 0, loc: "0,0" },
+    { type: "map_ozu", rotation: 0, loc: "0,2" },
+    { type: "map_mountain", rotation: 0, loc: "0,4" },
+    { type: "map_mountain", rotation: 0, loc: "0,6" },
+    { type: "map_mountain", rotation: 0, loc: "0,8" },
+    { type: "map_mountain", rotation: 0, loc: "0,10" },
+    { type: "map_mountain", rotation: 0, loc: "0,12" },
+    { type: "map_empty", rotation: 0, loc: "0,14" },
+    { type: "map_city", rotation: 0, loc: "0,16" },
+    { type: "map_empty", rotation: 0, loc: "1,1" },
+    { type: "map_mountain", rotation: 0, loc: "1,3" },
+    { type: "map_mountain", rotation: 0, loc: "1,5" },
+    { type: "map_empty", rotation: 0, loc: "1,7" },
+    { type: "map_kochi", rotation: 0, loc: "1,9" },
+    { type: "map_coastal", rotation: 0, loc: "1,11" },
+    { type: "map_mountain", rotation: 0, loc: "1,13" },
+    { type: "map_coastal", rotation: 0, loc: "1,15" },
+    { type: "map_fixed_22", rotation: 0, loc: "2,2" },
+    { type: "map_empty", rotation: 0, loc: "2,4" },
+    { type: "map_empty", rotation: 0, loc: "2,6" },
+    { type: "map_city", rotation: 0, loc: "2,12" },
+    { type: "map_mountain", rotation: 0, loc: "2,14" },
+    { type: "map_mountain", rotation: 0, loc: "3,1" },
+    { type: "map_mountain", rotation: 0, loc: "3,3" },
+    { type: "map_city", rotation: 0, loc: "3,5" },
+    { type: "map_fixed_313", rotation: 0, loc: "3,13" },
+    { type: "map_city", rotation: 0, loc: "4,2" },
+    { type: "map_coastal", rotation: 0, loc: "4,4" },
+  ];
+  
+  let newTiles = {  }
+
+  for(let tile of tilesInitialState) {
+      newTiles[tile.loc] = {type: tile.type, rotation: tile.rotation};
+  }
+
+  console.log(newTiles);
+

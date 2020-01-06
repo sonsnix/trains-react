@@ -2,37 +2,151 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#App {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.tile {
+  stroke: black;
+  stroke-width: 0.1%;
+  stroke-opacity: 0.5;
+  fill-opacity: 1.0;
+  fill: #f3f3e7;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.tile:hover {
+  stroke-opacity: 1;
+  stroke-width: 0.2%;
 }
 
-.App-link {
-  color: #61dafb;
+.tile-highlight {
+  stroke: red;
+  stroke-opacity: 1;
+  stroke-width: 0.2%;
+  fill: transparent;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.map_mountain {
+  fill: #dccbb9;
 }
+
+.map_yellow {
+  fill: #fedf2c;
+}
+
+.map_fixed {
+  fill: #c3c4c6;
+}
+
+.map_offsite {
+  fill: #df8181;
+}
+
+.map_river {
+  fill: #65b5d6;
+}
+
+.tile-special {
+  fill: #01a89e;
+}
+
+.station-sanuki {
+  fill: #79a242;
+  fill-opacity: 1;
+  stroke: black;
+  stroke-width: 0.1%;
+}
+
+.station-uwajima {
+  fill: #7d3529;
+  fill-opacity: 1;
+  stroke: black;
+  stroke-width: 0.1%;
+}
+
+.track {
+  stroke-opacity: 1;
+}
+
+g .phase-2 {
+  stroke: #bd9704;
+}
+
+g .phase-3 {
+  stroke: #4b7521;
+}
+
+g .phase-5 {
+  stroke: #753B0B;
+}
+
+.city-circle-2 {
+  fill: #fafaf3;
+  fill-opacity: 1;
+  stroke: #bd9704;
+  stroke-width: 0.28%;
+}
+.city-circle-3 {
+  fill: #fafaf3;
+  fill-opacity: 1;
+  stroke: #4b7521;
+  stroke-width: 0.28%;
+}
+.city-circle-5 {
+  fill: #fafaf3;
+  fill-opacity: 1;
+  stroke: #753b0b;
+  stroke-width: 0.28%;
+}
+
+.city-value {
+  fill: white;
+  text-anchor: middle;
+  font-size: 1.4%;
+}
+
+/* .map_mountain {
+  fill: #dccbb9;
+  fill-opacity: 0.2;
+}
+
+.map_yellow {
+  fill: #fedf2c;
+  fill-opacity: 0;
+}
+
+.map_fixed {
+  fill: #c3c4c6;
+  fill-opacity: 0;
+}
+
+.map_offsite {
+  fill: #df8181;
+  fill-opacity: 0.5;
+}
+
+.map_river {
+  fill: #65b5d6;
+  fill-opacity: 0.5;
+}
+
+.tile-special {
+  fill: #01a89e;
+}
+
+.station-sanuki {
+  fill: #79a242;
+  fill-opacity: 1;
+  stroke: black;
+  stroke-width: 0.1%;
+}
+
+.station-uwajima {
+  fill: #7d3529;
+  fill-opacity: 1;
+  stroke: black;
+  stroke-width: 0.1%;
+} */
