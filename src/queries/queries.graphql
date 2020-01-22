@@ -1,0 +1,55 @@
+query Companies {
+  getGames {
+    state {
+      companies {
+        id
+        cash
+        trains
+        initialOffer
+        market
+        floated
+        parValue
+        stockValue
+        fullName
+      }
+    }
+  }
+}
+
+query Players {
+  getGames {
+    state {
+      players {
+        id
+        cash
+        shares {
+          id
+          amount
+        }
+      }
+    }
+  }
+}
+
+mutation SubmitStockTurn($args: StockTurnArgs!) {
+  submitStockTurn(args: $args) {
+    companies {
+      id
+      cash
+      trains
+      initialOffer
+      market
+      floated
+      parValue
+      stockValue
+    }
+    players {
+      id
+      cash
+      shares {
+        id
+        amount
+      }
+    }
+  }
+}

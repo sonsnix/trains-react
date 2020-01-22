@@ -1,8 +1,7 @@
 import React, { useContext } from "react";
 
-import { Store } from "./store/store";
-import { TileType } from "./types";
-import { tilesData } from "./data";
+import { Store, TileType } from "../store/store";
+import { tilesData } from "../data";
 
 const TrackSegments: React.FC<{ type: string }> = props => {
   const geoDict: { [key: number]: string } = {

@@ -1,17 +1,22 @@
 import React, { useReducer } from "react";
 
 import { tilesInitialState } from "../data";
-import { TileType } from "../types";
 
 export { Store, StoreProvider };
 
-type StateType = {
+export type TileType = {
+  type: string;
+  rotation: number;
+};
+
+
+type GameState = {
   [key: string]: any;
   map: { tiles: { [key: string]: TileType } };
   companies: {};
   players: {};
   game: { curCompany: string; phase: string };
-  ui: { selectedLoc?: string}
+  ui: { selectedLoc?: string };
 };
 
 type ActionType = {
@@ -20,30 +25,30 @@ type ActionType = {
 };
 
 interface IContextProps {
-  state: StateType;
+  state: GameState;
   dispatch: any;
 }
 
-const initialState: StateType = {
+const initialState: GameState = {
   map: { tiles: tilesInitialState },
   game: { curCompany: "sanuki", phase: "track" },
   companies: { sanuki: {} },
   players: { Markus: { cash: 200 } },
-  ui: { selectedLoc: undefined}
+  ui: { selectedLoc: undefined }
 };
 const Store = React.createContext({} as IContextProps);
 
-function reducer(state: StateType, action: ActionType) {
+function reducer(state: GameState, action: ActionType) {
   console.log(action);
-  let newState: StateType;
+  let newState: GameState;
 
   switch (action.type) {
     case "SELECT_TILE":
-      newState = {...state};
+      newState = { ...state };
       newState.ui.selectedLoc = action.payload;
       return newState;
     case "SELECT_UPGRADE":
-      newState = {...state};
+      newState = { ...state };
       newState.map.tiles[state.ui.selectedLoc!].type = action.payload;
       return newState;
     default:
