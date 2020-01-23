@@ -47,6 +47,7 @@ export type GameState = {
 
 export type Mutation = {
    __typename?: 'Mutation',
+  login?: Maybe<Scalars['Boolean']>,
   authorizeWithGithub: Scalars['String'],
   submitStockTurn?: Maybe<GameState>,
   submitCompanyTurn: Scalars['String'],
@@ -149,6 +150,10 @@ export type CompaniesQuery = (
       & { companies: Array<(
         { __typename?: 'Company' }
         & Pick<Company, 'id' | 'cash' | 'trains' | 'initialOffer' | 'market' | 'floated' | 'parValue' | 'stockValue' | 'fullName'>
+        & { stockPosition: Maybe<(
+          { __typename?: 'StockPosition' }
+          & Pick<StockPosition, 'row' | 'col' | 'z'>
+        )> }
       )> }
     ) }
   )>> }
@@ -173,6 +178,14 @@ export type PlayersQuery = (
       )> }
     ) }
   )>> }
+);
+
+export type LoginMutationVariables = {};
+
+
+export type LoginMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'login'>
 );
 
 export type SubmitStockTurnMutationVariables = {
@@ -213,6 +226,11 @@ export const CompaniesDocument = gql`
         parValue
         stockValue
         fullName
+        stockPosition {
+          row
+          col
+          z
+        }
       }
     }
   }
@@ -318,6 +336,52 @@ export function usePlayersLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHook
 export type PlayersQueryHookResult = ReturnType<typeof usePlayersQuery>;
 export type PlayersLazyQueryHookResult = ReturnType<typeof usePlayersLazyQuery>;
 export type PlayersQueryResult = ApolloReactCommon.QueryResult<PlayersQuery, PlayersQueryVariables>;
+export const LoginDocument = gql`
+    mutation Login {
+  login
+}
+    `;
+export type LoginMutationFn = ApolloReactCommon.MutationFunction<LoginMutation, LoginMutationVariables>;
+export type LoginComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<LoginMutation, LoginMutationVariables>, 'mutation'>;
+
+    export const LoginComponent = (props: LoginComponentProps) => (
+      <ApolloReactComponents.Mutation<LoginMutation, LoginMutationVariables> mutation={LoginDocument} {...props} />
+    );
+    
+export type LoginProps<TChildProps = {}> = ApolloReactHoc.MutateProps<LoginMutation, LoginMutationVariables> & TChildProps;
+export function withLogin<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  LoginMutation,
+  LoginMutationVariables,
+  LoginProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, LoginMutation, LoginMutationVariables, LoginProps<TChildProps>>(LoginDocument, {
+      alias: 'login',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useLoginMutation__
+ *
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLoginMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        return ApolloReactHooks.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
+      }
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = ApolloReactCommon.MutationResult<LoginMutation>;
+export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const SubmitStockTurnDocument = gql`
     mutation SubmitStockTurn($args: StockTurnArgs!) {
   submitStockTurn(args: $args) {

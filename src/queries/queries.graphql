@@ -11,6 +11,11 @@ query Companies {
         parValue
         stockValue
         fullName
+        stockPosition {
+          row
+          col
+          z
+        }
       }
     }
   }
@@ -29,6 +34,10 @@ query Players {
       }
     }
   }
+}
+
+mutation Login {
+  login 
 }
 
 mutation SubmitStockTurn($args: StockTurnArgs!) {

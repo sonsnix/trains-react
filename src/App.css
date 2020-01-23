@@ -151,3 +151,16 @@ g .phase-5 {
   stroke: black;
   stroke-width: 0.1%;
 } */
+
+rect {
+  fill: transparent;
+  stroke: black;
+}
+
+circle {
+  stroke: black;
+}
+
+.company-button {
+  width: 4em;
+}

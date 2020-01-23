@@ -17,11 +17,13 @@ import {
   TableCell,
   TableBody,
   Badge,
+  Button,
 } from "@material-ui/core";
-import { usePlayersQuery } from "../generated/graphql";
+import { usePlayersQuery, useLoginMutation } from "../generated/graphql";
 
 export function PlayerDisplay() {
   const { loading, error, data } = usePlayersQuery();
+  const [login] = useLoginMutation();
 
   if (loading) return <p>Loading...</p>;
   if (error) {
@@ -57,6 +59,7 @@ export function PlayerDisplay() {
             ))}
         </TableBody>
       </Table>
+      <Button onClick={() => {login()}}>Login</Button>
     </TableContainer>
   );
 }

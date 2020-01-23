@@ -1,18 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext } from "react";
-import {
-  Toolbar,
-  Container,
-  Typography,
-  CssBaseline,
-  AppBar,
-  Grid,
-  Paper,
-  CardHeader} from "@material-ui/core";
+import { Toolbar, Container, Typography, CssBaseline, AppBar, Grid, Paper, CardHeader } from "@material-ui/core";
 
+import { ApolloClient } from 'apollo-client';
 
-import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { HttpLink } from 'apollo-link-http';
 
 import "./App.css";
 
@@ -22,9 +16,15 @@ import { tilesData } from "./data";
 
 import { PlayerDisplay } from "./components/PlayerDisplay";
 import { CompanyDisplay } from "./components/CompanyDisplay";
+import { StockMarketDisplay } from "./components/StockMarketDisplay";
+
 
 const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql"
+  cache: new InMemoryCache(),
+  link: new HttpLink({
+    credentials: 'include',
+    uri: "http://localhost:4000/graphql",
+  }),
 });
 
 const Tiles: React.FC = () => {
@@ -54,13 +54,7 @@ const TileSelection: React.FC = () => {
 
   for (const i in upgrades) {
     const upgrade = upgrades[i];
-    tiles.push(
-      <UpgradeTile
-        key={upgrade}
-        loc={`${i},0`}
-        tile={{ rotation: tile.rotation, type: upgrade }}
-      />
-    );
+    tiles.push(<UpgradeTile key={upgrade} loc={`${i},0`} tile={{ rotation: tile.rotation, type: upgrade }} />);
   }
 
   return (
@@ -78,6 +72,7 @@ const Board: React.FC = () => {
           <image href="./map.jpg" x="-1.64" y="-8.87" width="100%" />
           <Tiles />
         </svg>
+        <StockMarketDisplay />
       </Grid>
       <Grid item xs={1}>
         <TileSelection />

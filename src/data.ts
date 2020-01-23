@@ -14,6 +14,16 @@ interface TilesData {
   };
 }
 
+export const companyColors: {[key:string]: string} = {
+  "sanuki": "green",
+  "takamatsu": "red",
+  "iyo": "orange",
+  "awa": "grey",
+  "tosa electric": "turquoise",
+  "tosa": "blue",
+  "uwajima": "black"
+}
+
 const tilesInitialState = {
   "-5,11": { type: "7", rotation: 0 },
   "-4,14": { type: "map_takamatsu", rotation: 0 },

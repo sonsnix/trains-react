@@ -25,6 +25,7 @@ import { useCompaniesQuery, useSubmitStockTurnMutation, StockOrderType, Company 
 type OrderListItem = {
   amount: number;
   companyId: string;
+  type: StockOrderType;
 };
 
 export const CompanyDisplay: React.FC = () => {
@@ -39,6 +40,9 @@ export const CompanyDisplay: React.FC = () => {
     console.log(data);
     return <p>Error :(</p>;
   }
+
+  const state = data.getGames[0].state;
+  
   return (
     <TableContainer component={Paper}>
       <Table size="small">
@@ -46,41 +50,58 @@ export const CompanyDisplay: React.FC = () => {
           <TableRow>
             <TableCell>Company</TableCell>
             <TableCell align="right">Cash</TableCell>
-            <TableCell align="right">Value (IPO)</TableCell>
             <TableCell align="right">Trains</TableCell>
-            <TableCell align="right">Market | IPO</TableCell>
+            <TableCell align="left">IPO | Market </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data?.getGames?.length &&
-            data.getGames[0].state.companies.map((company) => (
+          {state.companies.map((company) => (
               <TableRow key={company.id}>
                 <TableCell component="th" scope="row">
                   {company.fullName}
                 </TableCell>
                 <TableCell align="right">{company.cash}</TableCell>
-                <TableCell align="right">
-                  {company.stockValue && `${company.stockValue} (${company.parValue})`}
-                </TableCell>
                 <TableCell align="right">{company.trains.join(" ")}</TableCell>
                 <TableCell>
                   <ButtonGroup color="primary" aria-label="outlined primary button group">
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        setOrders(adjustOrders("INCREASE", company.id, orders));
-                      }}
-                    >
-                      {company.market}
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        setOrders(adjustOrders("INCREASE", company.id, orders));
-                      }}
-                    >
-                      {company.initialOffer}
-                    </Button>
+                    {
+                      <Button
+                        className="company-button"
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => {
+                          company.initialOffer && setOrders(adjustOrders(StockOrderType.BuyInitial, company.id, orders));
+                        }}
+                      >
+                        {company.parValue
+                          ? company.initialOffer
+                            ? `${company.initialOffer}/$${company.parValue}`
+                            : "-"
+                          : "IPO"}
+                      </Button>
+                    }
+                    {
+                      <Button
+                        className="company-button"
+                        variant="outlined"
+                        onClick={() => {
+                          company.market && setOrders(adjustOrders(StockOrderType.BuyMarket, company.id, orders));
+                        }}
+                      >
+                        {company.market && company.stockValue ? `${company.market}/$${company.stockValue}` : "-"}
+                      </Button>
+                    }
+                    {
+                      <Button
+                        className="company-button"
+                        variant="outlined"
+                        onClick={() => {
+                          setOrders(adjustOrders(StockOrderType.Sell, company.id, orders));
+                        }}
+                      >
+                        Sell
+                      </Button>
+                    }
                   </ButtonGroup>
                 </TableCell>
               </TableRow>
@@ -90,10 +111,11 @@ export const CompanyDisplay: React.FC = () => {
       <Typography variant="body2" color="textSecondary" component="p">
         Orders
       </Typography>
-      {orders.map((order: { amount: number; companyId: string }) => {
+      {orders.map((order) => {
+        const type_to_string = { BUY_INITIAL: "Buy from IPO", BUY_MARKET: "Buy from Market", SELL: "Sell" };
         return (
           <p>
-            {order.companyId}: {order.amount}
+            {type_to_string[order.type]}: {order.companyId} x {order.amount}
           </p>
         );
       })}
@@ -119,17 +141,18 @@ export const CompanyDisplay: React.FC = () => {
   );
 };
 
-function adjustOrders(type: string, companyId: string, orders: OrderListItem[]): OrderListItem[] {
+function adjustOrders(type: StockOrderType, companyId: string, orders: OrderListItem[]): OrderListItem[] {
   return produce<OrderListItem[]>(orders, (newOrders) => {
     const order = newOrders.find((order) => order.companyId === companyId);
 
-    if (type === "INCREASE") {
-      if ((!order || order.amount === 0) && newOrders.find((order) => order.amount === 1)) return;
-      if (order && order.amount < 1) order.amount++;
-      else if (!order) newOrders.push({ amount: 1, companyId: companyId });
-    } else if (type === "DECREASE") {
-      if (order) order.amount--;
-      else if (!order) newOrders.push({ amount: -1, companyId: companyId });
+    if (order) {
+      if (order.type === StockOrderType.Sell && order.type === type) order.amount++;
+      else {
+        order.type = type;
+        order.amount = 1;
+       }
+    } else if (StockOrderType.Sell || !newOrders.find((order) => order.type !== StockOrderType.Sell)) {
+       newOrders.push({ amount: 1, companyId, type });
     }
   });
 }
@@ -139,9 +162,7 @@ function generateOrders(orders: OrderListItem[]) {
     .filter((order) => order.amount !== 0)
     .map((order) => {
       return {
-        type: order.amount > 0 ? StockOrderType.BuyInitial : StockOrderType.Sell,
-        amount: Math.abs(order.amount),
-        companyId: order.companyId,
+        ...order,
         value: 65,
       };
     });
