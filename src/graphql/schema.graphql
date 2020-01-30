@@ -1,0 +1,11 @@
+extend type Query {
+    ui: UserInterface!
+}
+
+type UserInterface {
+    selectedLoc: String
+}
+
+type Mutation {
+    selectMapTile(loc: String): Boolean
+}

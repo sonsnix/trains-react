@@ -20,7 +20,7 @@ import {
   Button,
 } from "@material-ui/core";
 import { produce } from "immer";
-import { useCompaniesQuery, useSubmitStockTurnMutation, StockOrderType, Company } from "../generated/graphql";
+import { usePlayersCompaniesQuery, useSubmitStockTurnMutation, StockOrderType, Company } from "../generated/graphql";
 import { companyColors } from "../data";
 
 const numColumns = [15, 15, 12, 10, 8, 7, 6, 5, 4, 4, 4].reverse();
@@ -53,7 +53,7 @@ const stockValues = [
 ];
 
 export const StockMarketDisplay: React.FC = () => {
-  const { loading, error, data } = useCompaniesQuery();
+  const { loading, error, data } = usePlayersCompaniesQuery();
 
   if (loading) return <p>Loading...</p>;
   if (error || !data?.getGames || data.getGames.length < 1) {

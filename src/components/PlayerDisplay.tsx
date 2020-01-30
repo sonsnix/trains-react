@@ -19,10 +19,10 @@ import {
   Badge,
   Button,
 } from "@material-ui/core";
-import { usePlayersQuery, useLoginMutation } from "../generated/graphql";
+import { usePlayersCompaniesQuery, useLoginMutation } from "../generated/graphql";
 
 export function PlayerDisplay() {
-  const { loading, error, data } = usePlayersQuery();
+  const { loading, error, data } = usePlayersCompaniesQuery();
   const [login] = useLoginMutation();
 
   if (loading) return <p>Loading...</p>;

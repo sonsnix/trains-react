@@ -43,19 +43,26 @@ export type GameState = {
   status: Status,
   companies: Array<Company>,
   players: Array<Player>,
+  tiles: Array<Tile>,
 };
 
 export type Mutation = {
    __typename?: 'Mutation',
-  login?: Maybe<Scalars['Boolean']>,
   authorizeWithGithub: Scalars['String'],
-  submitStockTurn?: Maybe<GameState>,
+  login?: Maybe<Scalars['Boolean']>,
+  selectMapTile?: Maybe<Scalars['Boolean']>,
   submitCompanyTurn: Scalars['String'],
+  submitStockTurn?: Maybe<GameState>,
 };
 
 
 export type MutationAuthorizeWithGithubArgs = {
   code: Scalars['String']
+};
+
+
+export type MutationSelectMapTileArgs = {
+  loc?: Maybe<Scalars['String']>
 };
 
 
@@ -73,22 +80,23 @@ export type Player = {
 
 export type Query = {
    __typename?: 'Query',
+  getGame?: Maybe<Game>,
+  getGames?: Maybe<Array<Game>>,
   getUser?: Maybe<User>,
   getUsers?: Maybe<Array<User>>,
   githubLoginUrl: Scalars['String'],
   me?: Maybe<User>,
-  getGame?: Maybe<Game>,
-  getGames?: Maybe<Array<Game>>,
-};
-
-
-export type QueryGetUserArgs = {
-  userId: Scalars['String']
+  ui: UserInterface,
 };
 
 
 export type QueryGetGameArgs = {
   gameId: Scalars['String']
+};
+
+
+export type QueryGetUserArgs = {
+  userId: Scalars['String']
 };
 
 export type Share = {
@@ -131,12 +139,110 @@ export type StockTurnArgs = {
   gameId: Scalars['String'],
 };
 
+export type Tile = {
+   __typename?: 'Tile',
+  id: Scalars['String'],
+  type: Scalars['String'],
+  rotation: Scalars['Float'],
+};
+
 export type User = {
    __typename?: 'User',
   id: Scalars['String'],
   name: Scalars['String'],
   games?: Maybe<Array<Game>>,
 };
+
+export type UserInterface = {
+   __typename?: 'UserInterface',
+  selectedLoc?: Maybe<Scalars['String']>,
+};
+
+export type MapFragment = (
+  { __typename?: 'GameState' }
+  & { tiles: Array<(
+    { __typename?: 'Tile' }
+    & Pick<Tile, 'id' | 'type' | 'rotation'>
+  )> }
+);
+
+export type StatusFragment = (
+  { __typename?: 'GameState' }
+  & { status: (
+    { __typename?: 'Status' }
+    & Pick<Status, 'curCompany' | 'curPhase' | 'curPriority' | 'playerOrder' | 'curTrainPhase'>
+  ) }
+);
+
+export type LocalFragment = (
+  { __typename?: 'Query' }
+  & { ui: (
+    { __typename?: 'UserInterface' }
+    & Pick<UserInterface, 'selectedLoc'>
+  ) }
+);
+
+export type SelectedLocQueryVariables = {};
+
+
+export type SelectedLocQuery = (
+  { __typename?: 'Query' }
+  & { ui: (
+    { __typename?: 'UserInterface' }
+    & Pick<UserInterface, 'selectedLoc'>
+  ) }
+);
+
+export type PlayersAndCompaniesFragment = (
+  { __typename?: 'GameState' }
+  & { companies: Array<(
+    { __typename?: 'Company' }
+    & Pick<Company, 'id' | 'cash' | 'trains' | 'initialOffer' | 'market' | 'floated' | 'parValue' | 'stockValue' | 'fullName'>
+    & { stockPosition: Maybe<(
+      { __typename?: 'StockPosition' }
+      & Pick<StockPosition, 'row' | 'col' | 'z'>
+    )> }
+  )>, players: Array<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'id' | 'cash' | 'passed'>
+    & { shares: Array<(
+      { __typename?: 'Share' }
+      & Pick<Share, 'id' | 'amount'>
+    )> }
+  )> }
+);
+
+export type MapQueryVariables = {};
+
+
+export type MapQuery = (
+  { __typename?: 'Query' }
+  & { getGames: Maybe<Array<(
+    { __typename?: 'Game' }
+    & { state: (
+      { __typename?: 'GameState' }
+      & MapFragment
+      & StatusFragment
+    ) }
+  )>>, ui: (
+    { __typename?: 'UserInterface' }
+    & Pick<UserInterface, 'selectedLoc'>
+  ) }
+);
+
+export type PlayersCompaniesQueryVariables = {};
+
+
+export type PlayersCompaniesQuery = (
+  { __typename?: 'Query' }
+  & { getGames: Maybe<Array<(
+    { __typename?: 'Game' }
+    & { state: (
+      { __typename?: 'GameState' }
+      & PlayersAndCompaniesFragment
+    ) }
+  )>> }
+);
 
 export type CompaniesQueryVariables = {};
 
@@ -197,21 +303,222 @@ export type SubmitStockTurnMutation = (
   { __typename?: 'Mutation' }
   & { submitStockTurn: Maybe<(
     { __typename?: 'GameState' }
-    & { companies: Array<(
-      { __typename?: 'Company' }
-      & Pick<Company, 'id' | 'cash' | 'trains' | 'initialOffer' | 'market' | 'floated' | 'parValue' | 'stockValue'>
-    )>, players: Array<(
-      { __typename?: 'Player' }
-      & Pick<Player, 'id' | 'cash'>
-      & { shares: Array<(
-        { __typename?: 'Share' }
-        & Pick<Share, 'id' | 'amount'>
-      )> }
-    )> }
+    & PlayersAndCompaniesFragment
   )> }
 );
 
+export const MapFragmentDoc = gql`
+    fragment Map on GameState {
+  tiles {
+    id
+    type
+    rotation
+  }
+}
+    `;
+export const StatusFragmentDoc = gql`
+    fragment Status on GameState {
+  status {
+    curCompany
+    curPhase
+    curPriority
+    playerOrder
+    curTrainPhase
+  }
+}
+    `;
+export const LocalFragmentDoc = gql`
+    fragment Local on Query {
+  ui {
+    selectedLoc
+  }
+}
+    `;
+export const PlayersAndCompaniesFragmentDoc = gql`
+    fragment PlayersAndCompanies on GameState {
+  companies {
+    id
+    cash
+    trains
+    initialOffer
+    market
+    floated
+    parValue
+    stockValue
+    fullName
+    stockPosition {
+      row
+      col
+      z
+    }
+  }
+  players {
+    id
+    cash
+    shares {
+      id
+      amount
+    }
+    passed
+  }
+}
+    `;
+export const SelectedLocDocument = gql`
+    query SelectedLoc {
+  ui {
+    selectedLoc
+  }
+}
+    `;
+export type SelectedLocComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<SelectedLocQuery, SelectedLocQueryVariables>, 'query'>;
 
+    export const SelectedLocComponent = (props: SelectedLocComponentProps) => (
+      <ApolloReactComponents.Query<SelectedLocQuery, SelectedLocQueryVariables> query={SelectedLocDocument} {...props} />
+    );
+    
+export type SelectedLocProps<TChildProps = {}> = ApolloReactHoc.DataProps<SelectedLocQuery, SelectedLocQueryVariables> & TChildProps;
+export function withSelectedLoc<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  SelectedLocQuery,
+  SelectedLocQueryVariables,
+  SelectedLocProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, SelectedLocQuery, SelectedLocQueryVariables, SelectedLocProps<TChildProps>>(SelectedLocDocument, {
+      alias: 'selectedLoc',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useSelectedLocQuery__
+ *
+ * To run a query within a React component, call `useSelectedLocQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSelectedLocQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSelectedLocQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useSelectedLocQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SelectedLocQuery, SelectedLocQueryVariables>) {
+        return ApolloReactHooks.useQuery<SelectedLocQuery, SelectedLocQueryVariables>(SelectedLocDocument, baseOptions);
+      }
+export function useSelectedLocLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SelectedLocQuery, SelectedLocQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<SelectedLocQuery, SelectedLocQueryVariables>(SelectedLocDocument, baseOptions);
+        }
+export type SelectedLocQueryHookResult = ReturnType<typeof useSelectedLocQuery>;
+export type SelectedLocLazyQueryHookResult = ReturnType<typeof useSelectedLocLazyQuery>;
+export type SelectedLocQueryResult = ApolloReactCommon.QueryResult<SelectedLocQuery, SelectedLocQueryVariables>;
+export const MapDocument = gql`
+    query Map {
+  getGames {
+    state {
+      ...Map
+      ...Status
+    }
+  }
+  ui @client {
+    selectedLoc
+  }
+}
+    ${MapFragmentDoc}
+${StatusFragmentDoc}`;
+export type MapComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<MapQuery, MapQueryVariables>, 'query'>;
+
+    export const MapComponent = (props: MapComponentProps) => (
+      <ApolloReactComponents.Query<MapQuery, MapQueryVariables> query={MapDocument} {...props} />
+    );
+    
+export type MapProps<TChildProps = {}> = ApolloReactHoc.DataProps<MapQuery, MapQueryVariables> & TChildProps;
+export function withMap<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  MapQuery,
+  MapQueryVariables,
+  MapProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, MapQuery, MapQueryVariables, MapProps<TChildProps>>(MapDocument, {
+      alias: 'map',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useMapQuery__
+ *
+ * To run a query within a React component, call `useMapQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMapQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMapQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMapQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<MapQuery, MapQueryVariables>) {
+        return ApolloReactHooks.useQuery<MapQuery, MapQueryVariables>(MapDocument, baseOptions);
+      }
+export function useMapLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<MapQuery, MapQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<MapQuery, MapQueryVariables>(MapDocument, baseOptions);
+        }
+export type MapQueryHookResult = ReturnType<typeof useMapQuery>;
+export type MapLazyQueryHookResult = ReturnType<typeof useMapLazyQuery>;
+export type MapQueryResult = ApolloReactCommon.QueryResult<MapQuery, MapQueryVariables>;
+export const PlayersCompaniesDocument = gql`
+    query PlayersCompanies {
+  getGames {
+    state {
+      ...PlayersAndCompanies
+    }
+  }
+}
+    ${PlayersAndCompaniesFragmentDoc}`;
+export type PlayersCompaniesComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<PlayersCompaniesQuery, PlayersCompaniesQueryVariables>, 'query'>;
+
+    export const PlayersCompaniesComponent = (props: PlayersCompaniesComponentProps) => (
+      <ApolloReactComponents.Query<PlayersCompaniesQuery, PlayersCompaniesQueryVariables> query={PlayersCompaniesDocument} {...props} />
+    );
+    
+export type PlayersCompaniesProps<TChildProps = {}> = ApolloReactHoc.DataProps<PlayersCompaniesQuery, PlayersCompaniesQueryVariables> & TChildProps;
+export function withPlayersCompanies<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  PlayersCompaniesQuery,
+  PlayersCompaniesQueryVariables,
+  PlayersCompaniesProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, PlayersCompaniesQuery, PlayersCompaniesQueryVariables, PlayersCompaniesProps<TChildProps>>(PlayersCompaniesDocument, {
+      alias: 'playersCompanies',
+      ...operationOptions
+    });
+};
+
+/**
+ * __usePlayersCompaniesQuery__
+ *
+ * To run a query within a React component, call `usePlayersCompaniesQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePlayersCompaniesQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePlayersCompaniesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePlayersCompaniesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<PlayersCompaniesQuery, PlayersCompaniesQueryVariables>) {
+        return ApolloReactHooks.useQuery<PlayersCompaniesQuery, PlayersCompaniesQueryVariables>(PlayersCompaniesDocument, baseOptions);
+      }
+export function usePlayersCompaniesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<PlayersCompaniesQuery, PlayersCompaniesQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<PlayersCompaniesQuery, PlayersCompaniesQueryVariables>(PlayersCompaniesDocument, baseOptions);
+        }
+export type PlayersCompaniesQueryHookResult = ReturnType<typeof usePlayersCompaniesQuery>;
+export type PlayersCompaniesLazyQueryHookResult = ReturnType<typeof usePlayersCompaniesLazyQuery>;
+export type PlayersCompaniesQueryResult = ApolloReactCommon.QueryResult<PlayersCompaniesQuery, PlayersCompaniesQueryVariables>;
 export const CompaniesDocument = gql`
     query Companies {
   getGames {
@@ -385,27 +692,10 @@ export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginMu
 export const SubmitStockTurnDocument = gql`
     mutation SubmitStockTurn($args: StockTurnArgs!) {
   submitStockTurn(args: $args) {
-    companies {
-      id
-      cash
-      trains
-      initialOffer
-      market
-      floated
-      parValue
-      stockValue
-    }
-    players {
-      id
-      cash
-      shares {
-        id
-        amount
-      }
-    }
+    ...PlayersAndCompanies
   }
 }
-    `;
+    ${PlayersAndCompaniesFragmentDoc}`;
 export type SubmitStockTurnMutationFn = ApolloReactCommon.MutationFunction<SubmitStockTurnMutation, SubmitStockTurnMutationVariables>;
 export type SubmitStockTurnComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SubmitStockTurnMutation, SubmitStockTurnMutationVariables>, 'mutation'>;
 

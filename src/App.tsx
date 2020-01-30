@@ -2,66 +2,78 @@
 import React, { useContext } from "react";
 import { Toolbar, Container, Typography, CssBaseline, AppBar, Grid, Paper, CardHeader } from "@material-ui/core";
 
-import { ApolloClient } from 'apollo-client';
+import { ApolloClient } from "apollo-client";
 
 import { ApolloProvider } from "@apollo/react-hooks";
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { HttpLink } from 'apollo-link-http';
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { HttpLink } from "apollo-link-http";
 
 import "./App.css";
 
-import { Tile, HighlightTile, UpgradeTile } from "./components/Tile";
-import { StoreProvider, Store } from "./store/store";
+import { Tile, HighlightTile } from "./components/Tile";
 import { tilesData } from "./data";
+import { localResolvers } from "./store/store";
 
 import { PlayerDisplay } from "./components/PlayerDisplay";
 import { CompanyDisplay } from "./components/CompanyDisplay";
 import { StockMarketDisplay } from "./components/StockMarketDisplay";
 
+import { useMapQuery } from "./generated/graphql";
+import { initialState } from "./store/store";
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: new HttpLink({
-    credentials: 'include',
+    credentials: "include",
     uri: "http://localhost:4000/graphql",
   }),
+  resolvers: localResolvers,
 });
 
-const Tiles: React.FC = () => {
-  const { state } = useContext(Store);
-  const tiles = [];
+client.writeData(initialState());
 
-  for (let loc in state.map.tiles) {
-    tiles.push(<Tile key={loc} loc={loc} tile={state.map.tiles[loc]} />);
+const Tiles: React.FC = () => {
+  const { loading, error, data } = useMapQuery();
+
+  if (!data?.getGames?.length) return <></>;
+
+  const ui = data.ui;
+  const state = data.getGames[0].state;
+
+  const tiles: JSX.Element[] = [];
+
+  for (let tile of state.tiles) {
+    tiles.push(<Tile key={tile.id} loc={tile.id} tile={tile} />);
   }
 
-  if (state.ui.selectedLoc !== undefined) {
-    tiles.push(<HighlightTile key="highlight" loc={state.ui.selectedLoc} />);
+  if (state.status.curPhase === "track" && ui.selectedLoc) {
+    tiles.push(<HighlightTile key="highlight" loc={ui.selectedLoc} />);
   }
   return <g>{tiles}</g>;
 };
 
 const TileSelection: React.FC = () => {
-  const { state } = useContext(Store);
+  // const { state } = useContext(Store);
 
-  if (state.ui.selectedLoc === undefined) {
-    return <></>;
-  }
+  // if (state.ui.selectedLoc === undefined) {
+  //   return <></>;
+  // }
 
-  const tile = state.map.tiles[state.ui.selectedLoc];
-  const upgrades = tilesData[tile.type].upgrades;
-  const tiles: React.ReactElement[] = [];
+  // const tile = state.map.tiles[state.ui.selectedLoc];
+  // const upgrades = tilesData[tile.type].upgrades;
+  // const tiles: React.ReactElement[] = [];
 
-  for (const i in upgrades) {
-    const upgrade = upgrades[i];
-    tiles.push(<UpgradeTile key={upgrade} loc={`${i},0`} tile={{ rotation: tile.rotation, type: upgrade }} />);
-  }
+  // for (const i in upgrades) {
+  //   const upgrade = upgrades[i];
+  //   tiles.push(<UpgradeTile key={upgrade} loc={`${i},0`} tile={{ rotation: tile.rotation, type: upgrade }} />);
+  // }
 
-  return (
-    <svg width="100%" height="500px" viewBox="-2.0 0.0 2 2">
-      {tiles}
-    </svg>
-  );
+  // return (
+  //   <svg width="100%" height="500px" viewBox="-2.0 0.0 2 2">
+  //     {tiles}
+  //   </svg>
+  // );
+  return <></>;
 };
 
 const Board: React.FC = () => {
@@ -94,23 +106,21 @@ const Board: React.FC = () => {
 const App: React.FC = () => {
   return (
     <ApolloProvider client={client}>
-      <StoreProvider>
-        <div className="App">
-          <CssBaseline />
-          <header>
-            <AppBar position="relative">
-              <Toolbar>
-                <Typography variant="h6">Trains</Typography>
-              </Toolbar>
-            </AppBar>
-          </header>
-          <main>
-            <Container fixed>
-              <Board />
-            </Container>
-          </main>
-        </div>
-      </StoreProvider>
+      <div className="App">
+        <CssBaseline />
+        <header>
+          <AppBar position="relative">
+            <Toolbar>
+              <Typography variant="h6">Trains</Typography>
+            </Toolbar>
+          </AppBar>
+        </header>
+        <main>
+          <Container fixed>
+            <Board />
+          </Container>
+        </main>
+      </div>
     </ApolloProvider>
   );
 };

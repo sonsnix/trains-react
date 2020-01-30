@@ -1,0 +1,125 @@
+fragment Map on GameState {
+  tiles {
+    id
+    type
+    rotation
+  }
+}
+
+fragment Status on GameState {
+  status {
+    curCompany
+    curPhase
+    curPriority
+    playerOrder
+    curTrainPhase
+  }
+}
+
+fragment Local on Query {
+  ui {
+    selectedLoc
+  }
+}
+
+query SelectedLoc {
+  ui {
+    selectedLoc
+  }
+}
+
+fragment PlayersAndCompanies on GameState {
+  companies {
+    id
+    cash
+    trains
+    initialOffer
+    market
+    floated
+    parValue
+    stockValue
+    fullName
+    stockPosition {
+      row
+      col
+      z
+    }
+  }
+  players {
+    id
+    cash
+    shares {
+      id
+      amount
+    }
+    passed
+  }
+}
+
+query Map {
+  getGames {
+    state {
+      ...Map
+      ...Status
+    }
+  }
+  ui @client {
+    selectedLoc
+  }
+}
+
+query PlayersCompanies {
+  getGames {
+    state {
+      ...PlayersAndCompanies
+    }
+  }
+}
+
+query Companies {
+  getGames {
+    state {
+      companies {
+        id
+        cash
+        trains
+        initialOffer
+        market
+        floated
+        parValue
+        stockValue
+        fullName
+        stockPosition {
+          row
+          col
+          z
+        }
+      }
+    }
+  }
+}
+
+query Players {
+  getGames {
+    state {
+      players {
+        id
+        cash
+        shares {
+          id
+          amount
+        }
+      }
+    }
+  }
+}
+
+mutation Login {
+  login
+}
+
+mutation SubmitStockTurn($args: StockTurnArgs!) {
+  submitStockTurn(args: $args) {
+    ...PlayersAndCompanies
+  }
+}

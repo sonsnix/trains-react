@@ -1,16 +1,17 @@
-import React, { useContext } from "react";
+import React from "react";
 
-import { Store, TileType } from "../store/store";
+import { TileType } from "../store/store";
 import { tilesData } from "../data";
+import { useApolloClient } from "@apollo/react-hooks";
 
-const TrackSegments: React.FC<{ type: string }> = props => {
+const TrackSegments: React.FC<{ type: string }> = (props) => {
   const geoDict: { [key: number]: string } = {
     0: "-0.866 0",
     1: "-0.433 -0.75",
     2: "0.433 -0.75",
     3: "0.866 0",
     4: "0.433 0.75",
-    5: "-0.433 0.75"
+    5: "-0.433 0.75",
   };
 
   const tileData = tilesData[props.type];
@@ -29,13 +30,7 @@ const TrackSegments: React.FC<{ type: string }> = props => {
     }
 
     segments.push(
-      <path
-        key={i}
-        d={geo}
-        className={`track phase-${tileData.phase}`}
-        strokeWidth="0.75%"
-        fill="transparent"
-      />
+      <path key={i} d={geo} className={`track phase-${tileData.phase}`} strokeWidth="0.75%" fill="transparent" />,
     );
   }
   return <g style={{ pointerEvents: "none" }}>{segments}</g>;
@@ -43,7 +38,7 @@ const TrackSegments: React.FC<{ type: string }> = props => {
 
 const StationSlots: React.FC<{
   tile: TileType;
-}> = props => {
+}> = (props) => {
   const tileData = tilesData[props.tile.type];
   let slots;
   let value;
@@ -55,16 +50,8 @@ const StationSlots: React.FC<{
     } else if (tileData.stationSlots === 2) {
       slots = (
         <g>
-          <circle
-            className={`city-circle-${tileData.phase}"`}
-            r="1.7%"
-            cy="1.7%"
-          />
-          <circle
-            className={`city-circle-${tileData.phase}"`}
-            r="1.7%"
-            cy="-1.7%"
-          />
+          <circle className={`city-circle-${tileData.phase}"`} r="1.7%" cy="1.7%" />
+          <circle className={`city-circle-${tileData.phase}"`} r="1.7%" cy="-1.7%" />
           <path
             d="M -0.3 -0.3 L -0.3 0.3 M 0.3 -0.3 L 0.3 0.3"
             className={`track-${tileData.phase}`}
@@ -75,36 +62,12 @@ const StationSlots: React.FC<{
     } else if (tileData.stationSlots === 3) {
       slots = (
         <g>
-          <circle
-            className={`city-circle-${tileData.phase}"`}
-            r="1.7%"
-            cx="0.0%"
-            cy="1.963%"
-          />
-          <circle
-            className={`city-circle-${tileData.phase}"`}
-            r="1.7%"
-            cx="1.7%"
-            cy="-0.981%"
-          />
-          <circle
-            className={`city-circle-${tileData.phase}"`}
-            r="1.7%"
-            cx="-1.7%"
-            cy="-0.981%"
-          />
+          <circle className={`city-circle-${tileData.phase}"`} r="1.7%" cx="0.0%" cy="1.963%" />
+          <circle className={`city-circle-${tileData.phase}"`} r="1.7%" cx="1.7%" cy="-0.981%" />
+          <circle className={`city-circle-${tileData.phase}"`} r="1.7%" cx="-1.7%" cy="-0.981%" />
         </g>
       );
-    } else
-      slots = (
-        <circle
-          r="1.0%"
-          fill="black"
-          opacity="1.0"
-          stroke="#bd9704"
-          strokeWidth="0.25%"
-        />
-      );
+    } else slots = <circle r="1.0%" fill="black" opacity="1.0" stroke="#bd9704" strokeWidth="0.25%" />;
 
     // add value circle
 
@@ -127,56 +90,52 @@ const StationSlots: React.FC<{
   );
 };
 
-export const HighlightTile: React.FC<{ loc: string }> = props => {
+export const HighlightTile: React.FC<{ loc: string }> = (props) => {
   const [row, col] = props.loc.split(",").map(Number);
   const points = "0.866,-0.5 0.866,0.5 0,1 -0.866,0.5 -0.866,-0.5 0,-1";
 
   return (
-    <g
-      className="tile tile-highlight"
-      transform={`translate(${col * 0.5 * Math.sqrt(3)},${row * 1.5})`}
-    >
+    <g className="tile tile-highlight" transform={`translate(${col * 0.5 * Math.sqrt(3)},${row * 1.5})`}>
       <polygon points={points} />
     </g>
   );
 };
 
-export const UpgradeTile: React.FC<{ loc: string; tile: TileType }> = props => {
-  const { dispatch } = useContext(Store);
-  const [row, col] = props.loc.split(",").map(Number);
-  const points = "0.866,-0.5 0.866,0.5 0,1 -0.866,0.5 -0.866,-0.5 0,-1";
+// export const UpgradeTile: React.FC<{ loc: string; tile: TileType }> = props => {
+//   const { dispatch } = useContext(Store);
+//   const [row, col] = props.loc.split(",").map(Number);
+//   const points = "0.866,-0.5 0.866,0.5 0,1 -0.866,0.5 -0.866,-0.5 0,-1";
 
-  return (
-    <g
-      className="tile"
-      transform={`translate(${col * 0.5 * Math.sqrt(3)},${row * 1.5})`}
-      onClick={() => dispatch({ type: "SELECT_UPGRADE", payload: props.tile.type })}
-    >
-      <polygon points={points} />
-      <TrackSegments type={props.tile.type} />
-      <StationSlots
-        tile={{ rotation: props.tile.rotation, type: props.tile.type }}
-      />
-    </g>
-  );
-};
+//   return (
+//     <g
+//       className="tile"
+//       transform={`translate(${col * 0.5 * Math.sqrt(3)},${row * 1.5})`}
+//       onClick={() => dispatch({ type: "SELECT_UPGRADE", payload: props.tile.type })}
+//     >
+//       <polygon points={points} />
+//       <TrackSegments type={props.tile.type} />
+//       <StationSlots
+//         tile={{ rotation: props.tile.rotation, type: props.tile.type }}
+//       />
+//     </g>
+//   );
+// };
 
-export const Tile: React.FC<{ loc: string; tile: TileType }> = props => {
-  const { dispatch } = useContext(Store);
+export const Tile: React.FC<{ loc: string; tile: TileType }> = (props) => {
   const points = "0.866,-0.5 0.866,0.5 0,1 -0.866,0.5 -0.866,-0.5 0,-1";
   const [row, col] = props.loc.split(",").map(Number);
+
+  const client = useApolloClient();
 
   return (
     <g
       className={"tile " + props.tile.type}
       transform={`translate(${col * 0.5 * Math.sqrt(3)},${row * 1.5})`}
-      onClick={() => dispatch({ type: "SELECT_TILE", payload: props.loc })}
+      onClick={() => client.writeData({ data: { ui: { selectedLoc: props.loc, __typename: "UserInterface" } } })}
     >
       <polygon points={points} />
       <TrackSegments type={props.tile.type} />
-      <StationSlots
-        tile={{ rotation: props.tile.rotation, type: props.tile.type }}
-      />
+      <StationSlots tile={{ rotation: props.tile.rotation, type: props.tile.type }} />
     </g>
   );
 };

@@ -13,14 +13,14 @@ import {
   Table,
   TableHead,
   TableRow,
-  TableCell,
+  TableCell, 
   TableBody,
   Link,
   ButtonGroup,
   Button,
 } from "@material-ui/core";
 import { produce } from "immer";
-import { useCompaniesQuery, useSubmitStockTurnMutation, StockOrderType, Company } from "../generated/graphql";
+import { usePlayersCompaniesQuery, useSubmitStockTurnMutation, StockOrderType, Company } from "../generated/graphql";
 
 type OrderListItem = {
   amount: number;
@@ -29,7 +29,7 @@ type OrderListItem = {
 };
 
 export const CompanyDisplay: React.FC = () => {
-  const { loading, error, data } = useCompaniesQuery();
+  const { loading, error, data } = usePlayersCompaniesQuery();
   const [submitStockTurn, { loading: mutationLoading, error: mutationError }] = useSubmitStockTurnMutation({
     onError: (e) => console.log(e.message),
   });
@@ -114,7 +114,7 @@ export const CompanyDisplay: React.FC = () => {
       {orders.map((order) => {
         const type_to_string = { BUY_INITIAL: "Buy from IPO", BUY_MARKET: "Buy from Market", SELL: "Sell" };
         return (
-          <p>
+          <p key={`order-${order.companyId}`}>
             {type_to_string[order.type]}: {order.companyId} x {order.amount}
           </p>
         );
